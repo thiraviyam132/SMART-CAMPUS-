@@ -1,0 +1,245 @@
+<!-- templates/user_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+    min-height: 100vh;
+    background: linear-gradient(120deg, #00ffe7, #7f00ff, #ff6ec4, #ffd86f);
+    background-size: 300% 300%;
+    animation: bgFlow 12s ease infinite;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.page-card {
+    background: rgba(0, 0, 0, 0.62);
+    border-radius: 20px;
+    padding: 26px;
+    color: #fff;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+}
+
+h2 {
+    font-weight: 800;
+    color: #00ffe7;
+    text-shadow: 0 0 16px rgba(0, 255, 231, 0.8);
+}
+
+.ai-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.ai-input {
+    background: rgba(255, 255, 255, 0.93);
+}
+
+.ai-result {
+    display: none;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(0, 255, 231, 0.12);
+    border: 1px solid rgba(0, 255, 231, 0.4);
+}
+
+.ai-result.visible {
+    display: block;
+}
+
+.welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 8, 26, 0.82);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.welcome-overlay.show {
+    display: flex;
+    animation: fadeIn 0.45s ease;
+}
+
+.welcome-box {
+    width: min(92%, 520px);
+    background: linear-gradient(145deg, #001e2e, #2f005e);
+    border: 2px solid rgba(0, 255, 231, 0.45);
+    border-radius: 18px;
+    text-align: center;
+    padding: 28px;
+    color: #fff;
+    box-shadow: 0 0 35px rgba(0, 255, 231, 0.3);
+    animation: popIn 0.65s ease;
+}
+
+.welcome-box h3 {
+    margin-bottom: 8px;
+    font-weight: 800;
+    color: #00ffe7;
+}
+
+.spark {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffd86f;
+    animation: floatSpark 1.4s ease-out forwards;
+}
+
+@keyframes bgFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes popIn {
+    from { transform: scale(0.82); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes floatSpark {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0.1); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-box" id="welcomeBox">
+        <h3>Welcome {{ user.name }}!</h3>
+        <p class="mb-3">You are now logged in to your student dashboard.</p>
+        <button id="startBtn" class="btn btn-warning">Start</button>
+    </div>
+</div>
+
+<div class="container mt-5 mb-5">
+<div class="page-card">
+<h2 class="mb-3">Welcome {{ user.name }}</h2>
+<a href="{{ url_for('logout') }}" class="btn btn-danger mb-3">Logout</a>
+<a href="{{ url_for('add_issue') }}" class="btn btn-success mb-3 ms-2">Add Issue</a>
+
+<div class="ai-card">
+    <h5 class="mb-2">AI Student Helper</h5>
+    <p class="mb-2 text-light">Describe your issue and get a quick title, category, and action plan.</p>
+    <textarea id="aiInput" class="form-control ai-input" rows="3" placeholder="Example: Attendance is marked absent even though I attended two labs last week..."></textarea>
+    <button id="aiBtn" class="btn btn-info mt-2">Generate AI Help</button>
+    <div id="aiResult" class="ai-result"></div>
+</div>
+
+{% if issues %}
+<table class="table table-striped table-dark">
+<thead>
+<tr>
+<th>Title</th>
+<th>Description</th>
+<th>Category</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{% for issue in issues %}
+<tr>
+<td>{{ issue.title }}</td>
+<td>{{ issue.description }}</td>
+<td>{{ issue.category }}</td>
+<td>{{ issue.status }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No issues found.</p>
+{% endif %}
+</div>
+</div>
+
+<script>
+const showWelcome = {{ 'true' if show_student_welcome else 'false' }};
+const overlay = document.getElementById('welcomeOverlay');
+const welcomeBox = document.getElementById('welcomeBox');
+const startBtn = document.getElementById('startBtn');
+const aiBtn = document.getElementById('aiBtn');
+const aiInput = document.getElementById('aiInput');
+const aiResult = document.getElementById('aiResult');
+
+function createSparks() {
+    const count = 18;
+    for (let i = 0; i < count; i += 1) {
+        const spark = document.createElement('span');
+        spark.className = 'spark';
+        spark.style.left = `${Math.random() * 100}%`;
+        spark.style.top = `${Math.random() * 100}%`;
+        spark.style.setProperty('--x', `${(Math.random() - 0.5) * 240}px`);
+        spark.style.setProperty('--y', `${(Math.random() - 0.5) * 220}px`);
+        welcomeBox.appendChild(spark);
+        setTimeout(() => spark.remove(), 1450);
+    }
+}
+
+if (showWelcome) {
+    overlay.classList.add('show');
+    createSparks();
+}
+
+startBtn.addEventListener('click', () => {
+    overlay.classList.remove('show');
+});
+
+aiBtn.addEventListener('click', async () => {
+    const text = aiInput.value.trim();
+    if (!text) {
+        aiResult.classList.add('visible');
+        aiResult.innerHTML = '<strong>Please enter your issue first.</strong>';
+        return;
+    }
+
+    aiResult.classList.add('visible');
+    aiResult.textContent = 'Generating AI help...';
+
+    try {
+        const response = await fetch('{{ url_for("student_ai_helper") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ issue_text: text })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Could not generate AI help');
+        }
+
+        aiResult.innerHTML = `
+            <strong>Suggested Title:</strong> ${data.suggested_title}<br>
+            <strong>Category:</strong> ${data.suggested_category}<br>
+            <strong>Priority:</strong> ${data.priority}<br>
+            <strong>Summary:</strong> ${data.summary}<br>
+            <strong>Next Steps:</strong>
+            <ul class="mb-0">
+                <li>${data.recommended_next_steps[0]}</li>
+                <li>${data.recommended_next_steps[1]}</li>
+                <li>${data.recommended_next_steps[2]}</li>
+            </ul>
+        `;
+    } catch (error) {
+        aiResult.innerHTML = `<strong>${error.message}</strong>`;
+    }
+});
+</script>
+</body>
+</html>

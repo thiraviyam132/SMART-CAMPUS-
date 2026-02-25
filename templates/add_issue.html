@@ -1,0 +1,154 @@
+<!-- templates/add_issue.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Issue - College Management</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+/* ===== BACKGROUND ===== */
+body{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(120deg,#00ffe7,#7f00ff,#ff6ec4,#ffd86f);
+    background-size:300% 300%;
+    animation:bgFlow 12s ease infinite;
+    font-family:'Segoe UI',sans-serif;
+}
+
+/* ===== GLASS CARD ===== */
+.glass-card{
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(16px);
+    border-radius:22px;
+    padding:35px;
+    box-shadow:0 0 40px rgba(0,0,0,0.7);
+    width:100%;
+    max-width:900px;
+    animation:slideIn 1s ease;
+}
+
+/* ===== HEADER ===== */
+h2{
+    font-weight:800;
+    color:#00ffe7;
+    text-shadow:0 0 20px #00ffe7;
+    animation:float 3s ease-in-out infinite;
+}
+
+/* ===== FORM ===== */
+form{
+    margin-top:20px;
+    background:rgba(255,255,255,0.1);
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+label{
+    font-weight:700;
+    color:#00ffe7;
+}
+
+/* ===== FULL COLOR INPUT STYLE (TITLE, DESC, CATEGORY) ===== */
+.full-color{
+    background:linear-gradient(135deg,#ff6ec4,#7f00ff,#00ffe7)!important;
+    color:#ffffff!important;
+    border:none!important;
+    font-weight:700;
+}
+
+.full-color::placeholder{
+    color:rgba(255,255,255,0.85);
+}
+
+.full-color:focus{
+    outline:none;
+    box-shadow:0 0 22px #00ffe7!important;
+}
+
+/* remove default select arrow bg clash */
+select.full-color option{
+    color:#000;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary{
+    background:linear-gradient(135deg,#ffd86f,#ff6ec4);
+    border:none;
+    font-weight:700;
+}
+.btn-primary:hover{
+    transform:scale(1.12);
+    box-shadow:0 0 25px #ff6ec4;
+}
+
+.btn-secondary{
+    background:linear-gradient(135deg,#00ffe7,#7f00ff);
+    border:none;
+    font-weight:700;
+}
+.btn-secondary:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 20px #00ffe7;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideIn{
+    from{opacity:0; transform:translateY(-40px);}
+    to{opacity:1; transform:translateY(0);}
+}
+@keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+}
+@keyframes bgFlow{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="glass-card">
+    <h2 class="text-center mb-4">Add New Issue</h2>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label>Title</label>
+            <input type="text" class="form-control full-color"
+                   name="title" placeholder="Enter issue title" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea class="form-control full-color"
+                      name="description" rows="4"
+                      placeholder="Describe the issue" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Category</label>
+            <select class="form-control full-color" name="category" required>
+                <option value="">Select category</option>
+                <option>Exam Issue</option>
+                <option>Library</option>
+                <option>Attendance</option>
+                <option>Fees</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Issue</button>
+        <a href="#" class="btn btn-secondary ms-2">Back</a>
+    </form>
+</div>
+
+</body>
+</html>

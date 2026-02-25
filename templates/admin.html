@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            background: linear-gradient(120deg,#141e30,#243b55);
+            min-height:100vh;
+            color:white;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn{
+            from{opacity:0; transform: translateY(20px);}
+            to{opacity:1; transform: translateY(0);}
+        }
+
+        .card{
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: 0.4s;
+        }
+
+        .card:hover{
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        table{
+            color:white;
+        }
+
+        thead{
+            background: rgba(0,0,0,0.3);
+        }
+
+        tr:hover{
+            background: rgba(255,255,255,0.08);
+            transition: 0.3s;
+        }
+
+        .status-select{
+            background:#0d6efd;
+            color:white;
+            border:none;
+            border-radius:8px;
+            padding:5px;
+        }
+
+        .logout-btn{
+            position:fixed;
+            top:20px;
+            right:20px;
+        }
+    </style>
+</head>
+<body>
+
+<a href="{{ url_for('logout') }}" class="btn btn-danger logout-btn">Logout</a>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">👨‍💼 Admin Dashboard</h2>
+
+    <div class="card p-4">
+        <h5 class="mb-3">📋 All Issues</h5>
+
+        {% if issues %}
+        <div class="table-responsive">
+            <table class="table table-borderless align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>User</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for issue in issues %}
+                    <tr>
+                        <td>{{ issue.title }}</td>
+                        <td>{{ issue.user.name if issue.user else "N/A" }}</td>
+                        <td>{{ issue.category }}</td>
+                        <td>{{ issue.status }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('update_status', id=issue.id) }}">
+                                <select name="status" class="status-select">
+                                    <option {% if issue.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option {% if issue.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option {% if issue.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                </select>
+                                <button class="btn btn-success btn-sm ms-2">✔</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-center">No issues found</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
